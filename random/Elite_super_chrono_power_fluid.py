@@ -51,6 +51,14 @@ def plot_activity(filename):
     from xml.dom import minidom
     mydoc = minidom.parse(filename)
     trackpoints = mydoc.getElementsByTagName('Trackpoint')
-    print(trackpoint_to_dic(trackpoints[200]))
+
+    time = []
+    distance = []
+    heartrate = []
+    speed = []
+    cadence = []
+    for trackpoint in trackpoints:
+        parsed = trackpoint_to_dic(trackpoint)
+        # TODO
 
 plot_activity("activity_4484818643.tcx")
