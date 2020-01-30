@@ -85,21 +85,22 @@ def plot_activity(filename):
     import matplotlib.pyplot as plt
     import numpy as np
     plt.subplot(4, 1, 1)
-    plt.plot(time, speed)
+    plt.plot(time, speed, 'g')
     plt.xlabel('Time (s)')
     plt.ylabel('Speed (Km/h)')
     plt.grid()
 
     plt.subplot(4, 1, 2)
-    plt.plot(time, power)
+    plt.plot(time, power, 'r')
     plt.xlabel('Time (s)')
     plt.ylabel('Power (W)')
+    
     plt.grid()
-
     plt.subplot(4, 1, 4)
-    plt.plot(time, heartrate)
+    plt.plot(time, heartrate, 'm')
     plt.xlabel('Time (s)')
     plt.ylabel('Heartrate (bpm)')
+    
     plt.grid()
 
     plt.subplot(4, 1, 3)
@@ -110,4 +111,14 @@ def plot_activity(filename):
 
     plt.show()
 
-plot_activity("activity_4484818643.tcx")
+
+from tkinter import filedialog
+from tkinter import *
+
+root = Tk()
+root.withdraw()
+root.update()
+filename = filedialog.askopenfilename(filetypes=(("Garmin tcx", "All *")))
+root.destroy()
+plot_activity(filename)
+
