@@ -59,6 +59,45 @@ def plot_activity(filename):
     cadence = []
     for trackpoint in trackpoints:
         parsed = trackpoint_to_dic(trackpoint)
-        # TODO
+        time.append(parsed["TimeStamp"])
+        if "HeartRate" in parsed:
+            heartrate.append(parsed["HeartRate"])
+        else:
+            heartrate.append(0)
+        if "DistanceMeters" in parsed:
+            distance.append(parsed["DistanceMeters"])
+        else:
+            distance.append(0)
+        if "Speed" in parsed:
+            speed.append(parsed["Speed"])
+        else:
+            speed.append(0)
+        if "Cadence" in parsed:
+            cadence.append(parsed["Cadence"])
+        else:
+            cadence.append(0)
+    
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import numpy as np
+    plt.subplot(3, 1, 1)
+    plt.plot(time, speed)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Speed (Km/h)')
+    plt.grid()
+
+    plt.subplot(3, 1, 2)
+    plt.plot(time, heartrate)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Heartrate (bpm)')
+    plt.grid()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(time, cadence)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Cadence (rpm)')
+    plt.grid()
+
+    plt.show()
 
 plot_activity("activity_4484818643.tcx")
