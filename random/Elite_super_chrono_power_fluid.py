@@ -18,6 +18,10 @@ lookup = [
     [1000.0, 46.5]
 ]
 
+maxheartrate=200
+
+ftp=300
+
 def cvt_speed_pwr(speed):
     speed = float(speed)
     if speed >= 46.5:
@@ -94,12 +98,22 @@ def plot_activity(filename):
     plt.plot(time, power, 'r')
     plt.xlabel('Time (s)')
     plt.ylabel('Power (W)')
+    plt.axhspan(0.56*ftp, 0.75*ftp, facecolor='lavender', alpha=0.5)
+    plt.axhspan(0.75*ftp, 0.90*ftp, facecolor='skyblue', alpha=0.5)
+    plt.axhspan(0.90*ftp, 1.05*ftp, facecolor='green', alpha=0.5)
+    plt.axhspan(1.05*ftp, 1.20*ftp, facecolor='tomato', alpha=0.5)
+    plt.axhspan(1.20*ftp, 1.40*ftp, facecolor='red', alpha=0.5)
     
     plt.grid()
     plt.subplot(4, 1, 4)
     plt.plot(time, heartrate, 'm')
     plt.xlabel('Time (s)')
     plt.ylabel('Heartrate (bpm)')
+    plt.axhspan(0.60*maxheartrate, 0.65*maxheartrate, facecolor='lavender', alpha=0.5)
+    plt.axhspan(0.65*maxheartrate, 0.75*maxheartrate, facecolor='skyblue', alpha=0.5)
+    plt.axhspan(0.75*maxheartrate, 0.82*maxheartrate, facecolor='green', alpha=0.5)
+    plt.axhspan(0.82*maxheartrate, 0.89*maxheartrate, facecolor='tomato', alpha=0.5)
+    plt.axhspan(0.89*maxheartrate, maxheartrate, facecolor='red', alpha=0.5)
     
     plt.grid()
 
