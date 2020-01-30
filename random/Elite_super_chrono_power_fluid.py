@@ -26,7 +26,7 @@ def cvt_speed_pwr(speed):
     for i in range(len(lookup)):
         if speed >= lookup[i][1] and speed <= lookup[i+1][1]:
             pwr = lookup[i][0] + (lookup[i+1][0]-lookup[i][0])*(speed-lookup[i][1])/(lookup[i+1][1]-lookup[i][1])
-            print("%f Km/h -> %f Watts" % (speed, pwr))
+            #print("%f Km/h -> %f Watts" % (speed, pwr))
             return pwr
 
 cvt_speed_pwr(30)
@@ -42,7 +42,7 @@ def trackpoint_to_dic(trackpoint):
     if len(trackpoint.getElementsByTagName('DistanceMeters')) > 0:
         dic["DistanceMeters"] = float(trackpoint.getElementsByTagName('DistanceMeters')[0].firstChild.data)
     if len(trackpoint.getElementsByTagName('ns3:Speed')) > 0:
-        dic["Speed"] = float(trackpoint.getElementsByTagName('ns3:Speed')[0].firstChild.data)
+        dic["Speed"] = 3.6*float(trackpoint.getElementsByTagName('ns3:Speed')[0].firstChild.data)
     if len(trackpoint.getElementsByTagName('Cadence')) > 0:
         dic["Cadence"] = int(trackpoint.getElementsByTagName('Cadence')[0].firstChild.data)
     return dic
@@ -55,8 +55,10 @@ def plot_activity(filename):
     time = []
     distance = []
     heartrate = []
+    power = []
     speed = []
     cadence = []
+    power = []
     for trackpoint in trackpoints:
         parsed = trackpoint_to_dic(trackpoint)
         time.append(parsed["TimeStamp"])
@@ -70,8 +72,10 @@ def plot_activity(filename):
             distance.append(0)
         if "Speed" in parsed:
             speed.append(parsed["Speed"])
+            power.append(cvt_speed_pwr(parsed["Speed"]))
         else:
             speed.append(0)
+            power.append(0)
         if "Cadence" in parsed:
             cadence.append(parsed["Cadence"])
         else:
@@ -80,19 +84,25 @@ def plot_activity(filename):
     import matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
-    plt.subplot(3, 1, 1)
+    plt.subplot(4, 1, 1)
     plt.plot(time, speed)
     plt.xlabel('Time (s)')
     plt.ylabel('Speed (Km/h)')
     plt.grid()
 
-    plt.subplot(3, 1, 2)
+    plt.subplot(4, 1, 2)
+    plt.plot(time, power)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Power (W)')
+    plt.grid()
+
+    plt.subplot(4, 1, 4)
     plt.plot(time, heartrate)
     plt.xlabel('Time (s)')
     plt.ylabel('Heartrate (bpm)')
     plt.grid()
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(4, 1, 3)
     plt.plot(time, cadence)
     plt.xlabel('Time (s)')
     plt.ylabel('Cadence (rpm)')
