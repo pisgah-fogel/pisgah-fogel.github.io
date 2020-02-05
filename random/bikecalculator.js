@@ -27,15 +27,16 @@ Weight loss:
 */
 
 theTire = tire.selectedIndex;
-		rollingRes = tireValues[theTire];
-		theAero = aero.selectedIndex;
-		frontalArea = aeroValues[theAero];
-		gradev = eval(grade.value) * 0.01;
-		headwindv = eval(headwind.value)  * (units ? 1.609 : 1.0) / 3.6;  // converted to m/s
-		distancev = eval(distance.value)  * (units ? 1.609 : 1.0);
-		temperaturev = ( eval(temperature.value) - (units ? 32.0 : 0.0) )  * (units ? 0.5555 : 1.0);
-		elevationv = eval(elevation.value)  * (units ? 0.3048 : 1.0);
-		transv = 0.95; // no one knows what this is, so why bother presenting a choice?
+rollingRes = tireValues[theTire];
+theAero = aero.selectedIndex;
+frontalArea = aeroValues[theAero];
+
+gradev = eval(grade.value) * 0.01;
+headwindv = eval(headwind.value)  * (units ? 1.609 : 1.0) / 3.6;  // converted to m/s
+distancev = eval(distance.value)  * (units ? 1.609 : 1.0);
+temperaturev = ( eval(temperature.value) - (units ? 32.0 : 0.0) )  * (units ? 0.5555 : 1.0);
+elevationv = eval(elevation.value)  * (units ? 0.3048 : 1.0);
+transv = 0.95; // no one knows what this is, so why bother presenting a choice?
  
 units = 0; // default is metric
 calcMode = 0; // zero means we calculate velocity, 1 means power
