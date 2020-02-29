@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: #282c34;
 }
 
 .App-logo {
@@ -35,4 +36,19 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+th,td {
+  background-color: #61dafb;
+  border: 10px #282c34;
+}
+
+td.blank {
+  background-color: #282c34;
+}
+
+table.calendar {
+  table-layout: auto;
+  width: 100%;
+  border: 10px #282c34;
 }
