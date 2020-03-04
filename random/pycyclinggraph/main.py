@@ -65,6 +65,16 @@ def dic_to_html(filename, dic):
         table += "<th>Weather</th>"
         table += "<th>Date</th>"
         table += "<th>Training</th>"
+        table += "<th>TSS</th>"
+        table += "<th>Km/Day</th>"
+        table += "<th>Daily Obj.</th>"
+        table += "<th>TSS Obj.</th>"
+        table += "<th>Muscu</th>"
+        table += "<th>Muscu Obj.</th>"
+        table += "<th>Hour/Week</th>"
+        table += "<th>Km/Week</th>"
+        table += "<th>Km Objective</th>"
+        table += "<th>TSS/Week</th>"
         table += "</tr>"
 
         table += "</thead><tbody>"
@@ -74,6 +84,16 @@ def dic_to_html(filename, dic):
             table += "<td>%s</td>" % row["Weather/BB"]
             table += "<td>%s</td>" % row["Date"]
             table += "<td>%s</td>" % row["Training"]
+            table += "<td>%s</td>" % row["TSS"]
+            table += "<td>%s</td>" % row["Km/Day"]
+            table += "<td>%s</td>" % row["Daily Objective"]
+            table += "<td>%s</td>" % row["TSS obj"]
+            table += "<td>%s</td>" % row["Muscu"]
+            table += "<td>%s</td>" % row["Muscu Objective"]
+            table += "<td>%s</td>" % row["Hour/Week"]
+            table += "<td>%s</td>" % row["Km/Week"]
+            table += "<td>%s</td>" % row["Km Objective"]
+            table += "<td>%s</td>" % row["TSS/Week"]
             table += "</tr>"
         table += "</tbody></table>"
 
