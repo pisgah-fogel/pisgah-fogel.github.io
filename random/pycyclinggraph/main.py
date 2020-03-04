@@ -22,17 +22,18 @@ def tsv_to_dic(filename):
     '''
     with open(filename) as file:
         count = 0
-        dic = {}
+        dic = []
         keys = []
         for line in file:
             splitted = line.split("\t")
             if count == 0:
                 for item in splitted:
-                    dic[item] = []
                     keys.append(item)
             else:
+                today = {}
                 for i in range(len(splitted)):
-                    dic[keys[i]].append(splitted[i])
+                    today[keys[i]] = splitted[i]
+                dic.append(today)
             count += 1
         return dic
     print("Error: Cannot open file %s" % filename)
