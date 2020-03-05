@@ -39,6 +39,46 @@ def tsv_to_dic(filename):
     print("Error: Cannot open file %s" % filename)
     return None
 
+def dic_to_table(dic):
+    table = "<table><caption>"
+    table += "Training logs"
+    table += "</caption><thead>"
+    table += "<tr>"
+    table += "<th>Weather</th>"
+    table += "<th>Date</th>"
+    table += "<th>Training</th>"
+    table += "<th>TSS</th>"
+    table += "<th>Km/Day</th>"
+    table += "<th>Daily Obj.</th>"
+    table += "<th>TSS Obj.</th>"
+    table += "<th>Muscu</th>"
+    table += "<th>Muscu Obj.</th>"
+    table += "<th>Hour/Week</th>"
+    table += "<th>Km/Week</th>"
+    table += "<th>Km Objective</th>"
+    table += "<th>TSS/Week</th>"
+    table += "</tr>"
+    table += "</thead><tbody>"
+    for row in dic:
+        table += "<tr>"
+        table += "<td>%s</td>" % row["Weather/BB"]
+        table += "<td>%s</td>" % row["Date"]
+        table += "<td>%s</td>" % row["Training"]
+        table += "<td>%s</td>" % row["TSS"]
+        table += "<td>%s</td>" % row["Km/Day"]
+        table += "<td>%s</td>" % row["Daily Objective"]
+        table += "<td>%s</td>" % row["TSS obj"]
+        table += "<td>%s</td>" % row["Muscu"]
+        table += "<td>%s</td>" % row["Muscu Objective"]
+        table += "<td>%s</td>" % row["Hour/Week"]
+        table += "<td>%s</td>" % row["Km/Week"]
+        table += "<td>%s</td>" % row["Km Objective"]
+        table += "<td>%s</td>" % row["TSS/Week"]
+        table += "</tr>"
+    table += "</tbody></table>"
+    return table
+
+
 def dic_to_html(filename, dic):
     with open(filename,"w") as file:
         file.write("<!DOCTYPE html>")
@@ -57,47 +97,7 @@ def dic_to_html(filename, dic):
 
         file.write("</head>")
         file.write("<body>")
-        table = "<table><caption>"
-        table += "Training logs"
-        table += "</caption><thead>"
-
-        table += "<tr>"
-        table += "<th>Weather</th>"
-        table += "<th>Date</th>"
-        table += "<th>Training</th>"
-        table += "<th>TSS</th>"
-        table += "<th>Km/Day</th>"
-        table += "<th>Daily Obj.</th>"
-        table += "<th>TSS Obj.</th>"
-        table += "<th>Muscu</th>"
-        table += "<th>Muscu Obj.</th>"
-        table += "<th>Hour/Week</th>"
-        table += "<th>Km/Week</th>"
-        table += "<th>Km Objective</th>"
-        table += "<th>TSS/Week</th>"
-        table += "</tr>"
-
-        table += "</thead><tbody>"
-
-        for row in dic:
-            table += "<tr>"
-            table += "<td>%s</td>" % row["Weather/BB"]
-            table += "<td>%s</td>" % row["Date"]
-            table += "<td>%s</td>" % row["Training"]
-            table += "<td>%s</td>" % row["TSS"]
-            table += "<td>%s</td>" % row["Km/Day"]
-            table += "<td>%s</td>" % row["Daily Objective"]
-            table += "<td>%s</td>" % row["TSS obj"]
-            table += "<td>%s</td>" % row["Muscu"]
-            table += "<td>%s</td>" % row["Muscu Objective"]
-            table += "<td>%s</td>" % row["Hour/Week"]
-            table += "<td>%s</td>" % row["Km/Week"]
-            table += "<td>%s</td>" % row["Km Objective"]
-            table += "<td>%s</td>" % row["TSS/Week"]
-            table += "</tr>"
-        table += "</tbody></table>"
-
-        file.write(table)
+        file.write(dic_to_table(dic))
         file.write("</body>")
         file.write("</html>")
 
