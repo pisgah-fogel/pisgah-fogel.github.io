@@ -39,6 +39,26 @@ def tsv_to_dic(filename):
     print("Error: Cannot open file %s" % filename)
     return None
 
+def text_to_iso_date(text):
+    splitted = text.split(' ')
+    output = "%s-" % splitted[3]
+    if splitted[2] == "january" or splitted[2] == "janvier":
+        output += "1"
+    elif splitted[2] == "february" or splitted[2] == u"février":
+        output += "2"
+    elif splitted[2] == "march" or splitted[2] == "mars":
+        output += "3"
+    output += "-%s" % splitted[1]
+    return output
+
+def is_first_day_of_the_week(day):
+    if day == 'monday' or day == 'lundi':
+        return True
+    return False
+
+def dic_to_weeks(dic):
+    return text_to_iso_date(dic[0]["Date"])
+
 def dic_to_table(dic):
     table = "<table><caption>"
     table += "Training logs"
@@ -154,7 +174,7 @@ def dic_to_html(filename, dic):
         file.write("</div>")
 
         file.write("<div id=\"Weeks\" class=\"tabcontent\">")
-        # TODO
+        file.write(dic_to_weeks(dic))
         file.write("</div>")
 
         file.write("<div id=\"Graphs\" class=\"tabcontent\">")
