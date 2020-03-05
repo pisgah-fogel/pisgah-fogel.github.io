@@ -89,9 +89,11 @@ def dic_to_html(filename, dic):
         # CSS Style
         file.write("\
         <style type=\"text/css\"> \
-        table, td, th { \
-            border: 1px solid gray; \
-        } \
+        th {\
+        background-color: #4CAF50;\
+        color: white;\
+        }\
+        tr:nth-child(even) {background-color: #f2f2f2;}\
         .tab {\
         overflow: hidden;\
         border: 1px solid #ccc;\
