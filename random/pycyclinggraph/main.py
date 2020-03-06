@@ -59,7 +59,15 @@ def is_first_day_of_the_week(day):
 
 def dic_to_weeks(dic):
     # TODO
-    return text_to_iso_date(dic[0]["Date"])
+    html = ""
+    summary = dic_to_weekly_sumary(dic)
+    for week in summary:
+        html += "<button class=\"accordion\">"
+        html += week["start"] + "<div align=\"center\">"
+        html += str(week["km"]) + "/"
+        html += week["km.obj"] + "</div>"
+        html += "</button>"
+    return html
 
 def dic_to_weekly_sumary(dic):
     weekly_sumary = []
@@ -162,6 +170,36 @@ def dic_to_html(filename, dic):
         border: 1px solid #ccc;\
         border-top: none;\
         }\
+        .accordion {\
+        background-color: #eee;\
+        color: #444;\
+        cursor: pointer;\
+        padding: 18px;\
+        width: 100%;\
+        text-align: left;\
+        border-top: 10px;\
+        outline: none;\
+        transition: 0.4s;\
+        }\
+        .active, .accordion:hover {\
+        background-color: #ccc;\
+        }\
+        .panel {\
+        padding: 0 18px;\
+        background-color: white;\
+        display: none;\
+        overflow: hidden;\
+        }\
+        .accordion:after {\
+        content: '\\02795';\
+        font-size: 13px;\
+        color: #777;\
+        float: right;\
+        margin-left: 5px;\
+        }\
+        .active:after {\
+        content: \"\\2796\";\
+        }\
         </style>\
         ")
 
@@ -215,5 +253,3 @@ if __name__== "__main__":
     dic = tsv_to_dic(filename)
 
     dic_to_html("index.html",dic)
-
-    print(dic_to_weekly_sumary(dic))
