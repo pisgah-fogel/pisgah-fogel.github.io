@@ -52,12 +52,34 @@ def text_to_iso_date(text):
     return output
 
 def is_first_day_of_the_week(day):
-    if day == 'monday' or day == 'lundi':
+    splitted = day.split(' ')
+    if splitted[0] == 'monday' or splitted[0] == 'lundi':
         return True
     return False
 
 def dic_to_weeks(dic):
+    # TODO
     return text_to_iso_date(dic[0]["Date"])
+
+def dic_to_weekly_sumary(dic):
+    weekly_sumary = []
+    km_sum = 0
+    first_day_date = dic[0]["Date"]
+    km_week_obj = dic[0]["Km Objective"]
+    for day in dic:
+        if is_first_day_of_the_week(day["Date"]):
+            weekly_sumary.append({"start":first_day_date,"km":km_sum,"km.obj":km_week_obj})
+            first_day_date = day["Date"]
+            km_sum = 0
+            km_week_obj = day["Km Objective"]
+        try:
+            km_sum += int(day["Km/Day"])
+        except ValueError:
+            km_sum += 0 # Placeholder for later
+
+    weekly_sumary.append({"start":first_day_date,"km":km_sum,"km.obj":km_week_obj}) # do not forget the last week
+    return weekly_sumary
+
 
 def dic_to_table(dic):
     table = "<table><caption>"
@@ -73,10 +95,10 @@ def dic_to_table(dic):
     table += "<th>TSS Obj.</th>"
     table += "<th>Muscu</th>"
     table += "<th>Muscu Obj.</th>"
-    table += "<th>Hour/Week</th>"
-    table += "<th>Km/Week</th>"
-    table += "<th>Km Objective</th>"
-    table += "<th>TSS/Week</th>"
+#    table += "<th>Hour/Week</th>"
+#    table += "<th>Km/Week</th>"
+#    table += "<th>Km Objective</th>"
+#    table += "<th>TSS/Week</th>"
     table += "</tr>"
     table += "</thead><tbody>"
     for row in dic:
@@ -90,10 +112,10 @@ def dic_to_table(dic):
         table += "<td>%s</td>" % row["TSS obj"]
         table += "<td>%s</td>" % row["Muscu"]
         table += "<td>%s</td>" % row["Muscu Objective"]
-        table += "<td>%s</td>" % row["Hour/Week"]
-        table += "<td>%s</td>" % row["Km/Week"]
-        table += "<td>%s</td>" % row["Km Objective"]
-        table += "<td>%s</td>" % row["TSS/Week"]
+#        table += "<td>%s</td>" % row["Hour/Week"]
+#        table += "<td>%s</td>" % row["Km/Week"]
+#        table += "<td>%s</td>" % row["Km Objective"]
+#        table += "<td>%s</td>" % row["TSS/Week"]
         table += "</tr>"
     table += "</tbody></table>"
     return table
@@ -193,3 +215,5 @@ if __name__== "__main__":
     dic = tsv_to_dic(filename)
 
     dic_to_html("index.html",dic)
+
+    print(dic_to_weekly_sumary(dic))
