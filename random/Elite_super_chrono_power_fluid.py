@@ -91,9 +91,6 @@ def plot_activity(filename):
             altitude.append(parsed["Altitude"])
         else:
             altitude.append(0)
-
-    for item in altitude:
-        print(item)
     
     import matplotlib
     import matplotlib.pyplot as plt
