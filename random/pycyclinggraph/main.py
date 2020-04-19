@@ -197,7 +197,7 @@ def dic_to_html(filename, dic):
         float: right;\
         margin-left: 5px;\
         }\
-        .active:after {\
+        .accordion:.active:after {\
         content: \"\\2796\";\
         }\
         </style>\
