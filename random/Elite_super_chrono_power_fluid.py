@@ -49,6 +49,8 @@ def trackpoint_to_dic(trackpoint):
         dic["Speed"] = 3.6*float(trackpoint.getElementsByTagName('ns3:Speed')[0].firstChild.data)
     if len(trackpoint.getElementsByTagName('Cadence')) > 0:
         dic["Cadence"] = int(trackpoint.getElementsByTagName('Cadence')[0].firstChild.data)
+    if len(trackpoint.getElementsByTagName('AltitudeMeters')) > 0:
+        dic["Altitude"] = float(trackpoint.getElementsByTagName('AltitudeMeters')[0].firstChild.data)
     return dic
 
 def plot_activity(filename):
@@ -63,6 +65,7 @@ def plot_activity(filename):
     speed = []
     cadence = []
     power = []
+    altitude = []
     for trackpoint in trackpoints:
         parsed = trackpoint_to_dic(trackpoint)
         time.append(parsed["TimeStamp"])
@@ -84,17 +87,24 @@ def plot_activity(filename):
             cadence.append(parsed["Cadence"])
         else:
             cadence.append(0)
+        if "Altitude" in parsed:
+            altitude.append(parsed["Altitude"])
+        else:
+            altitude.append(0)
+
+    for item in altitude:
+        print(item)
     
     import matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
-    plt.subplot(4, 1, 1)
+    plt.subplot(5, 1, 1)
     plt.plot(time, speed, 'g')
     plt.xlabel('Time (s)')
     plt.ylabel('Speed (Km/h)')
     plt.grid()
 
-    plt.subplot(4, 1, 2)
+    plt.subplot(5, 1, 2)
     plt.plot(time, power, 'r')
     plt.xlabel('Time (s)')
     plt.ylabel('Power (W)')
@@ -105,7 +115,7 @@ def plot_activity(filename):
     plt.axhspan(1.20*ftp, 1.40*ftp, facecolor='red', alpha=0.5)
     
     plt.grid()
-    plt.subplot(4, 1, 4)
+    plt.subplot(5, 1, 4)
     plt.plot(time, heartrate, 'm')
     plt.xlabel('Time (s)')
     plt.ylabel('Heartrate (bpm)')
@@ -117,10 +127,16 @@ def plot_activity(filename):
     
     plt.grid()
 
-    plt.subplot(4, 1, 3)
+    plt.subplot(5, 1, 3)
     plt.plot(time, cadence)
     plt.xlabel('Time (s)')
     plt.ylabel('Cadence (rpm)')
+    plt.grid()
+
+    plt.subplot(5, 1, 5)
+    plt.plot(time, altitude)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Altitude (m)')
     plt.grid()
 
     plt.show()
