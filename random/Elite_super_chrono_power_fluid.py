@@ -33,12 +33,11 @@ def cvt_speed_pwr(speed):
             #print("%f Km/h -> %f Watts" % (speed, pwr))
             return pwr
 
-cvt_speed_pwr(30)
-
 def trackpoint_to_dic(trackpoint):
     from dateutil.parser import parse
     import time
     dic = {}
+    power_available = False
     if len(trackpoint.getElementsByTagName('Time')) > 0:
         dic["TimeStamp"] = time.mktime(parse(trackpoint.getElementsByTagName('Time')[0].firstChild.data).timetuple())
     if len(trackpoint.getElementsByTagName('HeartRateBpm')) > 0:
@@ -47,11 +46,28 @@ def trackpoint_to_dic(trackpoint):
         dic["DistanceMeters"] = float(trackpoint.getElementsByTagName('DistanceMeters')[0].firstChild.data)
     if len(trackpoint.getElementsByTagName('ns3:Speed')) > 0:
         dic["Speed"] = 3.6*float(trackpoint.getElementsByTagName('ns3:Speed')[0].firstChild.data)
+    if len(trackpoint.getElementsByTagName('ns3:Watts')) > 0:
+        dic["Power"] = int(trackpoint.getElementsByTagName('ns3:Watts')[0].firstChild.data)
+        power_available = True
     if len(trackpoint.getElementsByTagName('Cadence')) > 0:
         dic["Cadence"] = int(trackpoint.getElementsByTagName('Cadence')[0].firstChild.data)
     if len(trackpoint.getElementsByTagName('AltitudeMeters')) > 0:
         dic["Altitude"] = float(trackpoint.getElementsByTagName('AltitudeMeters')[0].firstChild.data)
-    return dic
+    return (dic, power_available)
+
+def correct_altitude(list):
+    # Find first altitude
+    first_altitude = 0
+    for item in list:
+        if item != -10000:
+            first_altitude = item
+            break
+    for i in range(len(list)):
+        if list[i] == -10000:
+            list[i] = first_altitude
+        else:
+            first_altitude = list[i]
+    return list
 
 def plot_activity(filename):
     from xml.dom import minidom
@@ -61,13 +77,14 @@ def plot_activity(filename):
     time = []
     distance = []
     heartrate = []
-    power = []
     speed = []
     cadence = []
+    power_elite = []
     power = []
     altitude = []
+    power_available = False
     for trackpoint in trackpoints:
-        parsed = trackpoint_to_dic(trackpoint)
+        parsed, power_available = trackpoint_to_dic(trackpoint)
         time.append(parsed["TimeStamp"])
         if "HeartRate" in parsed:
             heartrate.append(parsed["HeartRate"])
@@ -79,9 +96,15 @@ def plot_activity(filename):
             distance.append(0)
         if "Speed" in parsed:
             speed.append(parsed["Speed"])
-            power.append(cvt_speed_pwr(parsed["Speed"]))
+            if not power_available:
+                power_elite.append(cvt_speed_pwr(parsed["Speed"]))
         else:
             speed.append(0)
+            if not power_available:
+                power_elite.append(0)
+        if "Power" in parsed:
+            power.append(parsed["Power"])
+        else:
             power.append(0)
         if "Cadence" in parsed:
             cadence.append(parsed["Cadence"])
@@ -90,8 +113,10 @@ def plot_activity(filename):
         if "Altitude" in parsed:
             altitude.append(parsed["Altitude"])
         else:
-            altitude.append(0)
+            altitude.append(-10000)
     
+    altitude = correct_altitude(altitude)
+
     import matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
@@ -101,17 +126,29 @@ def plot_activity(filename):
     plt.ylabel('Speed (Km/h)')
     plt.grid()
 
-    plt.subplot(5, 1, 2)
-    plt.plot(time, power, 'r')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Power (W)')
-    plt.axhspan(0.56*ftp, 0.75*ftp, facecolor='lavender', alpha=0.5)
-    plt.axhspan(0.75*ftp, 0.90*ftp, facecolor='skyblue', alpha=0.5)
-    plt.axhspan(0.90*ftp, 1.05*ftp, facecolor='green', alpha=0.5)
-    plt.axhspan(1.05*ftp, 1.20*ftp, facecolor='tomato', alpha=0.5)
-    plt.axhspan(1.20*ftp, 1.40*ftp, facecolor='red', alpha=0.5)
-    
-    plt.grid()
+    if not power_available:
+        plt.subplot(5, 1, 2)
+        plt.plot(time, power_elite, 'r')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Power on home trainer (W)')
+        plt.axhspan(0.56*ftp, 0.75*ftp, facecolor='lavender', alpha=0.5)
+        plt.axhspan(0.75*ftp, 0.90*ftp, facecolor='skyblue', alpha=0.5)
+        plt.axhspan(0.90*ftp, 1.05*ftp, facecolor='green', alpha=0.5)
+        plt.axhspan(1.05*ftp, 1.20*ftp, facecolor='tomato', alpha=0.5)
+        plt.axhspan(1.20*ftp, 1.40*ftp, facecolor='red', alpha=0.5)
+        plt.grid()
+    else:
+        plt.subplot(5, 1, 2)
+        plt.plot(time, power, 'r')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Assioma Duo Power (W)')
+        plt.axhspan(0.56*ftp, 0.75*ftp, facecolor='lavender', alpha=0.5)
+        plt.axhspan(0.75*ftp, 0.90*ftp, facecolor='skyblue', alpha=0.5)
+        plt.axhspan(0.90*ftp, 1.05*ftp, facecolor='green', alpha=0.5)
+        plt.axhspan(1.05*ftp, 1.20*ftp, facecolor='tomato', alpha=0.5)
+        plt.axhspan(1.20*ftp, 1.40*ftp, facecolor='red', alpha=0.5)
+        plt.grid()
+
     plt.subplot(5, 1, 4)
     plt.plot(time, heartrate, 'm')
     plt.xlabel('Time (s)')
