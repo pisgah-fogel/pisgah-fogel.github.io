@@ -74,6 +74,9 @@ def plot_activity(filename):
     mydoc = minidom.parse(filename)
     trackpoints = mydoc.getElementsByTagName('Trackpoint')
 
+    # Debug: TODO: remove after tests
+    trackpoints = trackpoints[2345:4000]
+
     time = []
     distance = []
     heartrate = []
