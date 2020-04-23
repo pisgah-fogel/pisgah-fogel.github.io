@@ -33,6 +33,12 @@ def cvt_speed_pwr(speed):
             #print("%f Km/h -> %f Watts" % (speed, pwr))
             return pwr
 
+def get_virtual_speed(time, distance, cadence, power_elite, altitude):
+    virtual_speed = []
+    for item in power_elite:
+        virtual_speed.append(item/300.0*41)
+    return virtual_speed
+
 def trackpoint_to_dic(trackpoint):
     from dateutil.parser import parse
     import time
@@ -119,15 +125,30 @@ def plot_activity(filename):
             altitude.append(-10000)
     
     altitude = correct_altitude(altitude)
+    virtual_speed = []
+    
+    if power_available:
+        print("Len of speed %d" % len(speed))
+        print("Len of power %d" % len(power))
+        virtual_speed = get_virtual_speed(time, distance, cadence, power, altitude)
 
     import matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
-    plt.subplot(5, 1, 1)
-    plt.plot(time, speed, 'g')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Speed (Km/h)')
-    plt.grid()
+
+    if not power_available:
+        plt.subplot(5, 1, 1)
+        plt.plot(time, speed, 'g')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Speed (Km/h)')
+        plt.grid()
+    else:
+        plt.subplot(5, 1, 1)
+        plt.plot(time, speed, 'g')
+        plt.plot(time, virtual_speed, 'r')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Speed (Km/h)')
+        plt.grid()
 
     if not power_available:
         plt.subplot(5, 1, 2)
