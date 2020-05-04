@@ -84,11 +84,16 @@ def plot_activity(filename):
     x = []
     y = []
     z = []
-    R = 6352.8 # Earth radix
+    R = 6352800 # Earth radix
     for i in range(len(altitude)):
         x.append(R * math.cos(math.radians(latitude[i])) * math.cos(math.radians(longitude[i])))
         y.append(R * math.cos(math.radians(latitude[i])) * math.sin(math.radians(longitude[i])))
-        z.append(R * math.sin(math.radians(latitude[i])) + altitude[i])
+        #z.append(R * math.sin(math.radians(latitude[i])) + altitude[i])
+        z.append(altitude[i])
+
+    # TODO remove those lines
+    print("Total distance: %dm" % distance[-1])
+    print("Total a vol d'oiseau %fm" % (math.sqrt((x[0]-x[-1])**2+(y[0]-y[-1])**2+(z[0]-z[-1])**2)))
     
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
