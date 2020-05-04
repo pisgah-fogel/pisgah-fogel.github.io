@@ -37,7 +37,11 @@ def get_virtual_speed(time, distance, cadence, power_elite, altitude):
     # convert altitude to gradient
     gradient = []
     for i in range(len(altitude)-1):
-        gradient.append((altitude[i+1] - altitude[i])/(distance[i+1] - distance[i]))
+        diff_distance = distance[i+1] - distance[i]
+        if diff_distance != 0:
+            gradient.append((altitude[i+1] - altitude[i])/diff_distance)
+        else:
+            gradient.append(0)
 
     virtual_speed = []
     for item in power_elite:
