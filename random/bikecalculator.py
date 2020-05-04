@@ -20,7 +20,7 @@ class Bike:
 
 class Road:
     def __init__(self, distance, elevation=0, temperature=20, grade=0, headwind=0):
-        self.grade = grade*0.01
+        self.grade = grade*0.01 # convert percentage to 0-1 range
         self.headwind = headwind/3.6
         self.distance = distance
         self.temperature = temperature

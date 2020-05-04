@@ -34,6 +34,11 @@ def cvt_speed_pwr(speed):
             return pwr
 
 def get_virtual_speed(time, distance, cadence, power_elite, altitude):
+    # convert altitude to gradient
+    gradient = []
+    for i in range(len(altitude)-1):
+        gradient.append((altitude[i+1] - altitude[i])/(distance[i+1] - distance[i]))
+
     virtual_speed = []
     for item in power_elite:
         virtual_speed.append(item/300.0*41)
