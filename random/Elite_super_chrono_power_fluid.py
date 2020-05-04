@@ -90,7 +90,8 @@ def plot_activity(filename):
     trackpoints = mydoc.getElementsByTagName('Trackpoint')
 
     # Debug: TODO: remove after tests
-    trackpoints = trackpoints[2345:4000]
+    if len(trackpoints) > 4000:
+        trackpoints = trackpoints[2345:4000]
 
     time = []
     distance = []
