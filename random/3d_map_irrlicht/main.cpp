@@ -32,13 +32,18 @@ int main()
 	}
 	IAnimatedMeshSceneNode* node = smgr->addAnimatedMeshSceneNode( mesh );
 
+	//IAnimatedMeshSceneNode* node = smgr->addOctreeSceneNode(IAnimatedMesh *mesh, SceneNode *parent = 0,s32 id = -1,s32 minimalPolysPerNode = 512,bool alsoAddIfMeshPointerZero = false) 	
+
 	if (node)
 	{
 		node->setMaterialFlag(EMF_LIGHTING, false);
 		node->setMD2Animation(scene::EMAT_STAND);
 		node->setMaterialTexture( 0, driver->getTexture("media/sydney.bmp") );
 	}
-	smgr->addCameraSceneNode(0, vector3df(0,30,-40), vector3df(0,5,0));
+	//smgr->addCameraSceneNode(0, vector3df(0,30,-40), vector3df(0,5,0));
+	smgr->addCameraSceneNodeFPS();
+	device->getCursorControl()->setVisible(false);
+
 	while(device->run())
 	{
 		driver->beginScene(true, true, SColor(255,100,101,140));
