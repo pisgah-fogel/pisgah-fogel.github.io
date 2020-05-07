@@ -1,4 +1,6 @@
 #include <irrlicht/irrlicht.h>
+#include "MyEventReceiver.h"
+
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -9,6 +11,7 @@ using namespace gui;
 #pragma comment(lib, "Irrlicht.lib")
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
+
 int main()
 {
 	IrrlichtDevice *device =
@@ -22,26 +25,18 @@ int main()
 	ISceneManager* smgr = device->getSceneManager();
 	IGUIEnvironment* guienv = device->getGUIEnvironment();
 
-	guienv->addStaticText(L"Hello World! This is the Irrlicht Software renderer!",
-			rect<s32>(10,10,460,62), false);
-	IAnimatedMesh* mesh = smgr->getMesh("media/sydney.md2");
-	if (!mesh)
-	{
-		device->drop();
-		return 1;
-	}
-	IAnimatedMeshSceneNode* node = smgr->addAnimatedMeshSceneNode( mesh );
+	driver->setTextureCreationFlag(video::ETCF_ALWAYS_32_BIT, true);
+
+	guienv->addStaticText(L"Press 'W' to change wireframe mode\nPress 'D' to toggle detail map\nPress 'S' to toggle skybox/skydome",
+			rect<s32>(380,10,620,62), false);
 
 	//IAnimatedMeshSceneNode* node = smgr->addOctreeSceneNode(IAnimatedMesh *mesh, SceneNode *parent = 0,s32 id = -1,s32 minimalPolysPerNode = 512,bool alsoAddIfMeshPointerZero = false) 	
 
-	if (node)
-	{
-		node->setMaterialFlag(EMF_LIGHTING, false);
-		node->setMD2Animation(scene::EMAT_STAND);
-		node->setMaterialTexture( 0, driver->getTexture("media/sydney.bmp") );
-	}
+	guienv->addImage(driver->getTexture("media/irrlichtlogo2.png"), core::position2d<s32>(10,10));
+	guienv->getSkin()->setFont(guienv->getFont("media/fontlucida.png"));
+
 	//smgr->addCameraSceneNode(0, vector3df(0,30,-40), vector3df(0,5,0));
-	scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS();
+	scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
 
 	camera->setPosition(core::vector3df(2700*2,255*2,2600*2));
     camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
@@ -100,9 +95,13 @@ int main()
 
     driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
 
-	while(device->run())
+	bool needToExit = false;
+	MyEventReceiver receiver(terrain, skybox, skydome, &needToExit);
+    device->setEventReceiver(&receiver);
+
+	while(device->run() && !needToExit)
 	{
-		driver->beginScene(true, true, SColor(255,100,101,140));
+		driver->beginScene(true, true, 0);
 
 		smgr->drawAll();
 		guienv->drawAll();
