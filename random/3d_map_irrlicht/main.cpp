@@ -14,8 +14,14 @@ using namespace gui;
 
 int main()
 {
+	// video::EDT_OPENGL
+    // video::EDT_DIRECT3D9
+    // video::EDT_DIRECT3D8
+    // video::EDT_BURNINGSVIDEO
+    // video::EDT_SOFTWARE
+    // video::EDT_NULL
 	IrrlichtDevice *device =
-		createDevice( video::EDT_SOFTWARE, dimension2d<u32>(640, 480), 16,
+		createDevice( video::EDT_OPENGL, dimension2d<u32>(640, 480), 16,
 				false, false, false, 0);
 
 	if (!device)
