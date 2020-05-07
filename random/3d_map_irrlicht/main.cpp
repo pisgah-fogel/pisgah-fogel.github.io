@@ -1,5 +1,6 @@
 #include <irrlicht/irrlicht.h>
 #include "MyEventReceiver.h"
+#include "roadSampleSceneNode.h"
 
 using namespace irr;
 using namespace core;
@@ -26,15 +27,15 @@ int main()
 
 	if (!device)
 		return 1;
-	device->setWindowCaption(L"Hello World! - Irrlicht Engine Demo");
+	device->setWindowCaption(L"3D map viewer - Irrlicht Engine Test");
 	IVideoDriver* driver = device->getVideoDriver();
 	ISceneManager* smgr = device->getSceneManager();
 	IGUIEnvironment* guienv = device->getGUIEnvironment();
 
 	driver->setTextureCreationFlag(video::ETCF_ALWAYS_32_BIT, true);
 
-	guienv->addStaticText(L"Press 'W' to change wireframe mode\nPress 'D' to toggle detail map\nPress 'S' to toggle skybox/skydome",
-			rect<s32>(380,10,620,62), false);
+	guienv->addStaticText(L"Press 'W' to change wireframe mode\nPress 'D' to toggle detail map\nPress 'S' to toggle skybox/skydome\nPress 'Q' to quit",
+			rect<s32>(380,10,620,82), false, true, 0, -1, true);
 
 	//IAnimatedMeshSceneNode* node = smgr->addOctreeSceneNode(IAnimatedMesh *mesh, SceneNode *parent = 0,s32 id = -1,s32 minimalPolysPerNode = 512,bool alsoAddIfMeshPointerZero = false) 	
 
@@ -42,11 +43,15 @@ int main()
 	guienv->getSkin()->setFont(guienv->getFont("media/fontlucida.png"));
 
 	//smgr->addCameraSceneNode(0, vector3df(0,30,-40), vector3df(0,5,0));
-	scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
+	scene::ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0,50.0f,0.6f);
 
 	camera->setPosition(core::vector3df(2700*2,255*2,2600*2));
     camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
     camera->setFarValue(42000.0f);
+
+	RoadSampleSceneNode *myNode =
+        new RoadSampleSceneNode(smgr->getRootSceneNode(), smgr, 666);
+	myNode->setPosition(core::vector3df(2397*2,343*2,2700*2));
 
 	device->getCursorControl()->setVisible(false);
 
@@ -105,6 +110,7 @@ int main()
 	MyEventReceiver receiver(terrain, skybox, skydome, &needToExit);
     device->setEventReceiver(&receiver);
 
+	u32 frames=0;
 	while(device->run() && !needToExit)
 	{
 		driver->beginScene(true, true, 0);
@@ -112,7 +118,20 @@ int main()
 		smgr->drawAll();
 		guienv->drawAll();
 
+		driver->draw2DRectangle(video::SColor(100,255,255,255),
+                core::rect<s32>(380,10,620,82));
+
 		driver->endScene();
+		if (++frames==100)
+        {
+            core::stringw str = L"3D map viewer [";
+            str += driver->getName();
+            str += L"] FPS: ";
+            str += (s32)driver->getFPS();
+
+            device->setWindowCaption(str.c_str());
+            frames=0;
+        }
 	}
 	device->drop();
 
