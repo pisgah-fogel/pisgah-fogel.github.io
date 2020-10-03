@@ -1,0 +1,11 @@
+body {
+	font-family: "Rubik", sans-serif;
+	text-align: justify;
+	font-size: 1.6rem;
+}
+.content {
+	overflow-y: auto;
+	padding: 0 15px;
+	padding-bottom: 0px;
+	padding-bottom: 50px;
+}
