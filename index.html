@@ -1,14 +1,65 @@
 <!DOCTYPE html>
+<meta charset="UTF-8"> 
 <html>
 <head>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body id="main">
 
-<h1>This is a heading</h1>
-<p> - <a href="secpil/SecPil.html">SecPil</a>: POC Test for pilotes</p>
-<p> - <a href="smallworld3d/SmallWorld3D.html">SmallWorld3D</a>: Game POC inspired by Stardew Valley/Animal Crossing</p>
-<p> - <a href="therobotcardgame/TheRobotCarGame.html">The Robot Card Game</a>: Game POCi, 2 robots, 2 players, 3 movements card per player.</p>
+
+<h1>Some of my (Web) Projects:</h1>
+<div id="content">
+
+<div class="body">
+<div class="polaroid">
+<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsdtimes.com%2Fwp-content%2Fuploads%2F2014%2F09%2Ftodo-manager-icon.png&f=1&nofb=1" class="center">
+<div class="container">
+<p><a href="secpil/SecPil.html">SecPil</a>: POC Test for pilotes</p>
+</div>
+</div>
+</div>
+
+<div class="body">
+<div class="polaroid">
+<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsdtimes.com%2Fwp-content%2Fuploads%2F2014%2F09%2Ftodo-manager-icon.png&f=1&nofb=1" class="center">
+<div class="container">
+<p><a href="smallworld3d/SmallWorld3D.html">SmallWorld3D</a>: Game POC inspired by Stardew Valley/Animal Crossing</p>
+</div>
+</div>
+</div>
+
+<div class="body">
+<div class="polaroid">
+<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsdtimes.com%2Fwp-content%2Fuploads%2F2014%2F09%2Ftodo-manager-icon.png&f=1&nofb=1" class="center">
+<div class="container">
+<p><a <a href="therobotcardgame/TheRobotCarGame.html">The Robot Card Game</a>: Game POCi, 2 robots, 2 players, 3 movements card per player.</p>
+</div>
+</div>
+</div>
+
+<script>
+function resized() {
+		const fontsize = 150;
+		const headersize = 0.2;
+		const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+		const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+		// Top, Right, Bottom, Left
+		let docstyle = document.getElementById("content").style;
+		docstyle.margin = 0.2*vh+"px "+0.25*vw+"px "+0.5*vh+"px "+0.25*vw+"px";
+		document.getElementsByTagName("h1")[0].style.height = headersize*vh+"px";
+		document.getElementsByTagName("h1")[0].style.top = headersize*vh+"px";
+
+		if (vw < 1200) {
+			document.getElementById("main").style.fontSize = (fontsize*vw/1200)+"%";
+		}
+		else {
+			document.getElementById("main").style.fontSize = fontsize+"%";
+		}
+	}
+	window.addEventListener('resize', resized);
+	resized();
+</script>
+<noscript>Sorry, your browser does not support JavaScript!</noscript>
 
 </body>
 </html>
