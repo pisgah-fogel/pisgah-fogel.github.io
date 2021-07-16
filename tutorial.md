@@ -188,6 +188,107 @@ By the time you read this I am very likely done with writing it, just ping me so
 
 ## Add instruction in Qemu
 
+You can learn more about Qemu insternals here: https://qemu.weilnetz.de/w32/2011/2011-10-28/qemu-tech.html 
+
+### CPUID
+The CPUID instruction is used by software (on Intel CPU) to learn about the details of the processor.
+Learn more on wikipedia: https://en.wikipedia.org/wiki/CPUID . This mechanism enable the software to check for accelerated hardware...
+
+We will add an entry to CPUID, when called it should set the bit 10 of RDX.
+
+ - Write a simple C program calling the cpuid instruction and checking the features: cpuid.c
+```
+#include <stdio.h>
+
+int main(int argc, char** argv) {
+	unsigned int rax, rbx, rcx, rdx;
+	puts("Calling cpuid");
+	__asm__ __volatile__ ("movq $1, %%rax\n\t"
+			"cpuid"
+			:
+			"=a"(rax),
+			"=b"(rbx),
+			"=c"(rcx),
+			"=d"(rdx));
+	printf("rdx = %x\n", rdx);
+	if (rdx & (1 << 10)) {
+		puts("[v] Hello feature OK");
+	}
+	else
+	{
+		puts("[x] Hello feature MISSING");
+	}
+	return 0;
+}
+```
+ - Have a look at what CPUID returns before you make any modification to Qemu (using the nice qemu user space emulation)
+```
+gcc cpuid.c -o cpuid
+../qemu_bin/bin/qemu-x86_64 ./cpuid # qemu_i386 if your gcc is 32 bits
+# Should return: Hello feature missing
+```
+ - Edit Qemu: Add which bit of CPUID you want to set in (In the example HELLO feature at bit 10) target/i386/cpu.h
+```
+/* cpuid_features bits */
+#define CPUID_FP87 (1U << 0)
+#define CPUID_VME  (1U << 1)
+#define CPUID_DE   (1U << 2)
+#define CPUID_PSE  (1U << 3)
+#define CPUID_TSC  (1U << 4)
+#define CPUID_MSR  (1U << 5)
+#define CPUID_PAE  (1U << 6)
+#define CPUID_MCE  (1U << 7)
+#define CPUID_CX8  (1U << 8)
+#define CPUID_APIC (1U << 9)
+#define CPUID_HELLO (1U << 10) // <= Add this
+#define CPUID_SEP  (1U << 11)
+#define CPUID_MTRR (1U << 12)
+#define CPUID_PGE  (1U << 13)
+#define CPUID_MCA  (1U << 14)
+#define CPUID_CMOV (1U << 15)
+#define CPUID_PAT  (1U << 16)
+#define CPUID_PSE36   (1U << 17)
+#define CPUID_PN   (1U << 18)
+#define CPUID_CLFLUSH (1U << 19)
+#define CPUID_DTS (1U << 21)
+#define CPUID_ACPI (1U << 22)
+#define CPUID_MMX  (1U << 23)
+#define CPUID_FXSR (1U << 24)
+#define CPUID_SSE  (1U << 25)
+#define CPUID_SSE2 (1U << 26)
+#define CPUID_SS (1U << 27)
+#define CPUID_HT (1U << 28)
+#define CPUID_TM (1U << 29)
+#define CPUID_IA64 (1U << 30)
+#define CPUID_PBE (1U << 31)
+```
+ - Add line 736 of file target/i386/cpu.c a clear text name for your feature
+```
+static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+	[FEAT_1_EDX] = {
+		.type = CPUID_FEATURE_WORD,
+		.feat_names = {
+				...
+			"cx8", "apic", "hello", "sep", // Hello should be the 10th item
+				...
+```
+ - If you want to add your feature to Pentium: edit target/i386/cpu.c line 620 (or PPRO_FEATURES which qemu_32 and 64 uses)
+```
+#define PENTIUM_FEATURES (I486_FEATURES | CPUID_DE | CPUID_TSC | \
+	CPUID_MSR | CPUID_MCE | CPUID_CX8 | CPUID_MMX | CPUID_APIC | CPUID_HELLO)
+```
+ - Compile and run in Qemu
+```
+make # compile Qemu
+make install # install qemu in your experiment directory (../qemu_bin)
+../qemu_bin/bin/qemu-x86_64 ./cpuid # qemu_i386 if your gcc is 32 bits
+# Should return: Hello feature OK
+```
+
+### Opcode 0xF1
+
+We'll now change the behavior of opcode 0xF1 (In Circuit Emulator BreakPoint) to something else.
+
 ## Create performance monitoring linux kernel module
 
 ## Create a page fault profiler linux kernel module
@@ -200,4 +301,3 @@ By the time you read this I am very likely done with writing it, just ping me so
 
 ## Further reading
 Understanding the Linux Kernel, Third Edition by Daniel P. Bovet, Marco Cesati Ph.D
-
