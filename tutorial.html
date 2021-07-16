@@ -12,12 +12,10 @@ qemu-5.1.0
 </code></pre><ul><li>Configure: </li></ul><pre><code>./configure --prefix=$PWD/../qemu_bin
 </code></pre><ul><li>Make: </li></ul><pre><code>make
 </code></pre><p>Note: you can have a look at the next section while this is running
-<br /><ul><li>Install (in your test directory): </li></ul></p><pre><code>make install
-</code></pre><h2> Getting a Linux image</h2><p>If you want to learn more about creating your own embedded linux: <a href="https://wiki.gentoo.org/wiki/Custom_Initramfs">wiki.gentoo.org/wiki/Custom_Initramfs</a> |
-<br />https://tldp.org/HOWTO/Bootdisk-HOWTO/x88.html |
-<br />https://tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html |
-<br />https://www.linuxfromscratch.org/lfs/view/stable/
-<br /></p><ul><li>Get linux source code</li><li>Start with a default linux kernel config:</li></ul><pre><code>make defconfig # Get default config
+<br /></p><ul><li>Install (in your test directory): </li></ul><pre><code>make install
+</code></pre><h2> Getting a Linux image</h2><p>If you want to learn more about creating your own embedded linux: <a href="https://wiki.gentoo.org/wiki/Custom_Initramfs">wiki.gentoo.org/wiki/Custom_Initramfs</a> | <a href="https://tldp.org/HOWTO/Bootdisk-HOWTO/x88.html">tldp.org/HOWTO/Bootdisk-HOWTO/x88.html</a> | <a href="https://tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html">tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html</a> | <a href="https://www.linuxfromscratch.org/lfs/view/stable/
+">www.linuxfromscratch.org/lfs/view/stable/
+</a><br /></p><ul><li>Get linux source code</li><li>Start with a default linux kernel config:</li></ul><pre><code>make defconfig # Get default config
 
 # Make sure you have the following settings in .config
 CONFIG_EXT4_FS=y

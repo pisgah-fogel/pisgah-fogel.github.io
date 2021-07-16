@@ -41,11 +41,7 @@ Note: you can have a look at the next section while this is running
 make install
 ```
 ## Getting a Linux image
-If you want to learn more about creating your own embedded linux: https://wiki.gentoo.org/wiki/Custom_Initramfs |
-https://tldp.org/HOWTO/Bootdisk-HOWTO/x88.html |
-https://tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html |
-https://www.linuxfromscratch.org/lfs/view/stable/
-
+If you want to learn more about creating your own embedded linux: https://wiki.gentoo.org/wiki/Custom_Initramfs | https://tldp.org/HOWTO/Bootdisk-HOWTO/x88.html | https://tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html | https://www.linuxfromscratch.org/lfs/view/stable/
 - Get linux source code
 - Start with a default linux kernel config:
 ```
