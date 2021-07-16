@@ -106,6 +106,10 @@ sub convert_file {
 			print(OUTPUTF "<h4>$1</h4>");
 		}
 		elsif ( $line =~ m/^[ ]?-[ ]*(.*)$/) {
+			if ($in_a_paragraph) {
+				print(OUTPUTF "</p>");
+				$in_a_paragraph = 0;
+			}
 			if (not $in_a_list) {
 				$in_a_list = 1;
 				print(OUTPUTF "<ul>");
@@ -115,6 +119,10 @@ sub convert_file {
 			print(OUTPUTF "<li>$tmp</li>");
 		}
 		else {
+			if ($in_a_list) {
+				print(OUTPUTF "</ul>");
+				$in_a_list = 0;
+			}
 			if (not $in_a_paragraph) {
 				print(OUTPUTF "<p>");
 				$in_a_paragraph = 1;
