@@ -44,4 +44,25 @@ div.container {
 	margin-right: auto;
 	width: 50%;
 	height: 50%;
-  }
+}
+
+code {
+	font-family: monospace;
+	background-color: #eee;
+	border: 1px solid #999;
+	display: block;
+	padding: 20px;
+}
+
+li {
+	margin-bottom: 9px;
+}
+
+pre {
+	overflow-x: auto;
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
+}

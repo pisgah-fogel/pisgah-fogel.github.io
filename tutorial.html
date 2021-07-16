@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+	<head>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body id="main">
+		<h1>Compiling Qemu and create a linux syscall</h1>
+		<div id="content">
+			<p>
+			We are going to compile Qemu (emulator) from source so
+			we can modify it in an other tutorial.
+			We will add a custom system call in the linux, compile the linux kernel, and finally write 
+			program to call our syscall (ramfs are usually used to start the actual
+			system but we are going to write our own minimalist
+			system).
+			</p>
+			<p>
+			Objective: Get more familiar with the linux kernel
+			environment/structure.
+			</p>
+
+			<h2>Setting up Qemu</h2>
+			<ul>
+				<li>Download QEmu: <code>wget https://download.qemu.org/qemu-5.1.0.tar.xz</code></li>
+				<li>Untar/Uncompress (keep the archive so you
+					can revert your changes if needed):
+					<code>tar xf ./qemu-5.1.0.tar.xz && cd
+						qemu-5.1.0</code></li>
+				<li>Create a directory for your experimental
+					Qemu: <code>mkdir
+						../qemu_bin</code></li>
+				<li>Check for dependencies for your platform 
+					<a href="https://wiki.qemu.org/Hosts/Linux/">on Qemu's website</a>
+				</li>
+				<li>If you are on debian you can use:
+					<code>sudo apt-get install git
+						libglib2.0-dev libfdt-dev
+						libpixman-1-dev
+						zlib1g-dev</code></li>
+				<li>Configure: <code>./configure
+						--prefix=$PWD/../qemu_bin</code></li>
+				<li>Make: <code>make</code></li>
+				<p>Note: you can have a look at the next
+				section while this is running</p>
+				<li>Install (in your test directory): <code>make install</code></li>
+			</ul>
+			<h2>Getting a Linux image</h2>
+			<p>If you want to learn more about creating your own
+			embedded linux: <a
+						href="https://wiki.gentoo.org/wiki/Custom_Initramfs">
+				checkout Gentoo's documentation</a> |
+					<a href="https://tldp.org/HOWTO/Bootdisk-HOWTO/x88.html">this howto</a> |
+					<a
+						href="https://tldp.org/HOWTO/From-PowerUp-To-Bash-Prompt-HOWTO.html">
+						From power up to bash</a> |
+					<a
+						href="https://www.linuxfromscratch.org/lfs/view/stable/">
+						Linux from scratch</a>
+			<ul>
+				<li>Get linux source code</li>
+				<li>Start with a default linux kernel
+					config:
+					<pre><code>make defconfig # Get default config
+
+# Make sure you have the following settings
+CONFIG_EXT4_FS=y
+CONFIG_IA32_EMULATION=y
+CONFIG_VIRTIO_PCI=y (Virtualization -> PCI driver for virtio devices)
+CONFIG_VIRTIO_BALLOON=y (Virtualization -> Virtio balloon driver)
+CONFIG_VIRTIO_BLK=y (Device Drivers -> Block -> Virtio block driver)
+CONFIG_VIRTIO_NET=y (Device Drivers -> Network device support -> Virtio network
+driver)
+CONFIG_VIRTIO=y
+CONFIG_VIRTIO_RING=y
+				</code></pre></li>
+				<li>You can edit your config with the nice ncurse interface: <code>make menuconfig</code></li>
+				<li>Optional: Make an image to be used inside Qemu: (Will take a while)
+					<code>make bzImage</code></li>
+				<li>Optional: Create an initial system to run:
+					<code>/sbin/mkinitramfs -o ramdisk.img</code></li>
+				<li>Optional: Try your kernel:
+					<pre><code># To quit: Ctrl+a c q
+./bin/qemu-system-x86_64 -drive driver=raw,file=./hd.img,if=virtio \
+	-m 1024 \
+	-kernel /data/projects/linux_staging/arch/x86/boot/bzImage \
+	-initrd ramdisk.img \
+	-no-reboot \
+	-nographic -append "console=ttyS0"
+					</code></pre>
+					<li>Optional: If you want to graphical interface:
+						<pre><code>cd your_path_to_qemu_bin/
+# Create a virtual hard-drive
+./bin/qemu-img create -f raw hd.img 8G
+./bin/qemu-system-x86_64 -drive driver=raw,file=./hd.img,if=virtio \
+	-m 1024 \
+	-kernel /data/projects/linux_staging/arch/x86/boot/bzImage \
+	-initrd ramdisk.img \
+	-no-reboot
+						</code></pre>
+						Install a vnc client (example for debian):
+						<code>sudo apt install tigervnc-viewer</code>
+						Get the screen from your Qemu VM:
+						<code>vncviewer
+							127.0.0.1::5900</code>
+					</li>
+			</ul>
+			<h2>Add a syscall in the linux kernel</h2>
+			<ul>
+				<li>arch/x86/entry/syscalls/syscall_64.tbl
+<pre><code># After the last common entry
+447	common	hello	sys_hello
+</code></pre>
+				</li>
+				<li>kernel/sys.c
+<pre><code>struct __attribute__((__packed__)) filestat {
+    unsigned long st_dev; /* ID of device containing file */
+    unsigned long st_uid; /* user ID of owner */
+    unsigned long st_gid; /* group ID of owner */
+    unsigned long st_rdev; /* device ID (if special file) */
+};
+
+SYSCALL_DEFINE2(hello, const char*, path, struct filestat*, buf)
+{
+    char buffer[256];
+    long copied = strncpy_from_user(buffer, path, sizeof(buffer));
+    if (copied < 0 || copied == sizeof(buffer))
+        return -EFAULT;
+    printk(KERN_INFO "hello argument from the user: \"%s\"\n",
+    buf->st_dev = 42; // Just a simple test
+    return 0;
+}
+</code></pre>
+				</li>
+			</ul>
+			<h2>Write a C program calling this syscall</h2>
+			<ul>
+				<li>test.c
+<pre><code>#include <stdio.h>
+#include <stdio.h>
+#include <unistd.h>
+
+struct __attribute__((__packed__)) filestat {
+    unsigned long st_dev; /* ID of device containing file */
+    unsigned long st_uid; /* user ID of owner */
+    unsigned long st_gid; /* group ID of owner */
+    unsigned long st_rdev; /* device ID (if special file) */
+};
+
+int main(int argc, char* argv[])
+{
+    printf("Testing syscall 447...\n");
+    char array[] = "Hello, world!\n";
+    struct filestat fs;
+    fs.st_dev = 0;
+    printf("st_dev before call %ld.\n", fs.st_dev);
+    long res = syscall(447, array, &fs);
+    printf("System call returned %ld.\n", res);
+    printf("st_dev after call %ld.\n", fs.st_dev);
+    sleep(999999999);
+}
+</code></pre></li>
+<li>Compile (Statically): <code>gcc -static test.c -o init</code></li>
+<li>Convert to RAM filesystem: <code>echo init | cpio -o -H newc | gzip > test.cpio.gz</code></li>
+<li>Run (Ctrl+a c q to quit):
+	<pre><code>./bin/qemu-system-x86_64 -drive driver=raw,file=./hd.img,if=virtio \
+	-m 1024 \
+	-kernel /data/projects/linux_staging/arch/x86/boot/bzImage \
+	-initrd ./test.cpio.gz \
+	-no-reboot \
+	-nographic -append "console=ttyS0"</code></pre></li>
+			</ul>
+			<h2>Write a syscall that does something</h2>
+			<p>By the time you read this I am very likely done with
+			writing it, just ping me so I update it</p>
+		</div>
+	</body>
+</html>
+
+
+
+
+
