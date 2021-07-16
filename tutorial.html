@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="styles.css">
 	</head>
 	<body id="main">
-		<h1>Compiling Qemu and create a linux syscall</h1>
+		<h1>Qemu and Linux kernel hacking</h1>
 		<div id="content">
 			<p>
 			We are going to compile Qemu (emulator) from source so
@@ -134,6 +134,8 @@ SYSCALL_DEFINE2(hello, const char*, path, struct filestat*, buf)
 				</li>
 			</ul>
 			<h2>Write a C program calling this syscall</h2>
+			<p>You can learn more about syscall by reading the
+			manual: <code>man –S 2 intro</code></p>
 			<ul>
 				<li>test.c
 <pre><code>#include <stdio.h>
@@ -173,6 +175,22 @@ int main(int argc, char* argv[])
 			<h2>Write a syscall that does something</h2>
 			<p>By the time you read this I am very likely done with
 			writing it, just ping me so I update it</p>
+
+			<h2>Add instruction in Qemu</h2>
+
+			<h2>Create performance monitoring linux kernel module</h2>
+
+			<h2>Create a page fault profiler linux kernel module</h2>
+
+			<h2>Write a multi-threading library</h2>
+
+			<h2>Write your own CPU simulator using Qemu</h2>
+			
+			<h2>Add GCC support for your own CPU</h2>
+
+			<h2>Further reading</h2>
+			<p>Understanding the Linux Kernel, Third Edition by
+			Daniel P. Bovet, Marco Cesati Ph.D</p>
 		</div>
 	</body>
 </html>
