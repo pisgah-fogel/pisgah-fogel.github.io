@@ -183,6 +183,50 @@ int main(int argc, char** argv) {
 make install # install qemu in your experiment directory (../qemu_bin)
 ../qemu_bin/bin/qemu-x86_64 ./cpuid # qemu_i386 if your gcc is 32 bits
 # Should return: Hello feature OK
-</code></pre><h3> Opcode 0xF1</h3><p>We'll now change the behavior of opcode 0xF1 (In Circuit Emulator BreakPoint) to something else.
-<br /></p><h2> Create performance monitoring linux kernel module</h2><h2> Create a page fault profiler linux kernel module</h2><h2> Write a multi-threading library</h2><h2> Write your own CPU simulator using Qemu</h2><h2> Add GCC support for your own CPU</h2><h2> Further reading</h2><p>Understanding the Linux Kernel, Third Edition by Daniel P. Bovet, Marco Cesati Ph.D
+</code></pre><h3> Opcode 0xF1</h3><p>We'll now change the behavior of opcode 0xF1 (In Circuit Emulator BreakPoint) to something else. As an example we'll make it set RAX (the accumulator) to 42.
+<br /></p><ul><li>Write a simple C program, calling the instruction and get some reference results</li></ul><p>More information about inline assembly here: <a href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html">gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html</a> 
+<br /></p><pre><code>#include <stdio.h>
+
+int main(int argc, char** argv)
+{
+    unsigned int rax;
+    __asm__ __volatile__ (
+	    "movq $0xdeadbeef, %%rax\n\t"
+            ".byte 0xf1\n\t" // Our instruction
+            : "=r" (rax));
+     printf("42 = %08x\n", rax);
+     return 0;
+}
+</code></pre><ul><li>Try it</li></ul><pre><code>gcc 0xF1.c -o 0xF1
+../qemu_bin/bin/qemu-x86_64 ./0xF1
+# You will get:
+# qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+# Illegal instruction
+</code></pre><ul><li>Here is how you could figure out yourself what the software architecture looks like even if it is not properly documented</li></ul><pre><code># We want to implement opcode 0xf1, start by searching files for '0xf1'
+grep -nrw . --include=\*.c -e "0xf1" | grep i386 | less
+# It returns: ./target/i386/translate.c:7063:    case 0xf1: /* icebp ... */
+# We know that Qemu translates the instructions to a RISC like equivalent in translate.c so that makes sense
+
+# Looking around in translate.c we learn what such RISC like instructions looks like:
+# 	gen_op_mov_v_reg(s, MO_8, s->T0, R_AH);
+# gen_op_mov_v_reg is defined line 391
+# 	s is of type DisasContext
+# 	s->T0 is of type TCGv (TCGv_i32_d TCGv_i64_d), that's a temporary register used in Qemu
+# TCGv_... is a pointer to un undefined structure, to learn more about this smart trick have a look at ./include/tcg/tcg.h line 368
+# 	Looking around tcg.h we can find tcg_const_local_i64 to create a constant value
+
+# Let's look at how the MOV internal instruction is implemented
+# To search for it in headers:
+grep -nrw . --include=\*.h -m 1 -e "tcg_gen_mov_i64"
+# tcg_gen_mov_i64 (tcg-op.h) generates an opcode op2_i64/INDEX_op_mov_i64
+# Opcodes are defines in ./include/tcg/tcg-opc.h
+
+# With this short investigation we found other interesting instructions, like: tcg_gen_movi_i64
+# We can use it to set RAX to 0x42
+</code></pre><ul><li>To implement your instruction edit translate.c line 7062 to look like:</li></ul><pre><code>case 0xf1: /* Experimental instruction, moving 42 to RAX */
+	tcg_gen_movi_tl(cpu_regs[R_EAX], 0x42);
+	break;
+</code></pre><ul><li>It is time to try your changes</li></ul><pre><code>../qemu_bin/bin/qemu-x86_64 ./0xF1
+# You will get: "42 = 00000042" congratulation !
+</code></pre><ul><li>Optional: You can now add a more complete instruction, you could do matrix operation with the datas pointed by rsi and store the result in rdi (there are security considerations... but it would be a great exercise)</li></ul><h2> Create performance monitoring linux kernel module</h2><h2> Create a page fault profiler linux kernel module</h2><h2> Write a multi-threading library</h2><h2> Write your own CPU simulator using Qemu</h2><h2> Add GCC support for your own CPU</h2><h2> Further reading</h2><p>Understanding the Linux Kernel, Third Edition by Daniel P. Bovet, Marco Cesati Ph.D
 <br /></div></body></html>

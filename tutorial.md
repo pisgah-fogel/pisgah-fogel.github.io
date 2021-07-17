@@ -287,7 +287,69 @@ make install # install qemu in your experiment directory (../qemu_bin)
 
 ### Opcode 0xF1
 
-We'll now change the behavior of opcode 0xF1 (In Circuit Emulator BreakPoint) to something else.
+We'll now change the behavior of opcode 0xF1 (In Circuit Emulator BreakPoint) to something else. As an example we'll make it set RAX (the accumulator) to 42.
+
+ - Write a simple C program, calling the instruction and get some reference results
+
+More information about inline assembly here: https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html 
+```
+#include <stdio.h>
+
+int main(int argc, char** argv)
+{
+    unsigned int rax;
+    __asm__ __volatile__ (
+	    "movq $0xdeadbeef, %%rax\n\t"
+            ".byte 0xf1\n\t" // Our instruction
+            : "=r" (rax));
+     printf("42 = %08x\n", rax);
+     return 0;
+}
+```
+ - Try it
+```
+gcc 0xF1.c -o 0xF1
+../qemu_bin/bin/qemu-x86_64 ./0xF1
+# You will get:
+# qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+# Illegal instruction
+```
+ - Here is how you could figure out yourself what the software architecture looks like even if it is not properly documented
+```
+# We want to implement opcode 0xf1, start by searching files for '0xf1'
+grep -nrw . --include=\*.c -e "0xf1" | grep i386 | less
+# It returns: ./target/i386/translate.c:7063:    case 0xf1: /* icebp ... */
+# We know that Qemu translates the instructions to a RISC like equivalent in translate.c so that makes sense
+
+# Looking around in translate.c we learn what such RISC like instructions looks like:
+# 	gen_op_mov_v_reg(s, MO_8, s->T0, R_AH);
+# gen_op_mov_v_reg is defined line 391
+# 	s is of type DisasContext
+# 	s->T0 is of type TCGv (TCGv_i32_d TCGv_i64_d), that's a temporary register used in Qemu
+# TCGv_... is a pointer to un undefined structure, to learn more about this smart trick have a look at ./include/tcg/tcg.h line 368
+# 	Looking around tcg.h we can find tcg_const_local_i64 to create a constant value
+
+# Let's look at how the MOV internal instruction is implemented
+# To search for it in headers:
+grep -nrw . --include=\*.h -m 1 -e "tcg_gen_mov_i64"
+# tcg_gen_mov_i64 (tcg-op.h) generates an opcode op2_i64/INDEX_op_mov_i64
+# Opcodes are defines in ./include/tcg/tcg-opc.h
+
+# With this short investigation we found other interesting instructions, like: tcg_gen_movi_i64
+# We can use it to set RAX to 0x42
+```
+ - To implement your instruction edit translate.c line 7062 to look like:
+```
+case 0xf1: /* Experimental instruction, moving 42 to RAX */
+	tcg_gen_movi_tl(cpu_regs[R_EAX], 0x42);
+	break;
+```
+ - It is time to try your changes
+```
+../qemu_bin/bin/qemu-x86_64 ./0xF1
+# You will get: "42 = 00000042" congratulation !
+```
+ - Optional: You can now add a more complete instruction, you could do matrix operation with the datas pointed by rsi and store the result in rdi (there are security considerations... but it would be a great exercise)
 
 ## Create performance monitoring linux kernel module
 
